@@ -1,0 +1,52 @@
+** Example
+
+$which = new Which('node');
+$which->setEnvironment('PATH', '/usr/bin:/usr/local/bin');
+
+*** SSH
+
+$sshOptions = [
+    'StrictHostKeyChecking' => 'false',
+    'UserKnownHostsFile'    => '/home/user/.ssh/custom_known_hosts',
+];
+$ssh = new Ssh();
+$ssh->setIdentity('/home/user/.ssh/custom_id_rsa');
+$ssh->setOptions($sshOptions);
+
+*** GIT
+
+$git = new Git('clone');
+$git
+    ->setRepository('git@github.com:phamviet/command-builder.git')
+    ->cloneTo("/home/user/public_html")
+    ->setEnvironment('GIT_SSH_COMMAND', $ssh);
+
+$git = new Git('pull');
+$git->setEnvironment('GIT_SSH_COMMAND', $ssh);
+$git->run('/Users/viet/www/himmag');
+
+
+*** MYSQL
+
+$mysql = new Mysql();
+$mysql
+    ->setUser('user')
+    ->setPassword('password')
+    ->setDatabase('db_name')
+    ->setFromFile('/path/to/restore/db.sql');
+
+
+*** RSYNC
+
+$rsync = new Rsync();
+$rsync
+    ->setOption('avz')
+    ->setSsh($ssh);
+
+$rsync
+    ->setSource('source')
+    ->setTarget('target');
+
+*** du
+
+Du::getSize('/path');

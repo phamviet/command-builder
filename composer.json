@@ -1,0 +1,16 @@
+{
+    "name": "phamviet/command-builder",
+    "autoload": {
+        "psr-4": { "Phamviet\\CommandBuilder\\" : "src/CommandBuilder/" }
+    },
+    "require": {
+        "symfony/process": "~2.7"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Viet Pham",
+            "email": "phpcodervn@gmail.com"
+        }
+    ]
+}
