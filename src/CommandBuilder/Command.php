@@ -198,7 +198,7 @@ abstract class Command
                     $this->getName(),
                     $this->buildOptions($this->options)
                 ],
-                $this->arguments
+                array_map("escapeshellarg", $this->arguments)
             )
         );
 
