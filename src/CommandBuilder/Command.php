@@ -15,6 +15,7 @@ abstract class Command
 
     protected $fromFile;
     protected $outputToFile;
+    protected $pipe;
 
     protected $path;
 
@@ -44,6 +45,19 @@ abstract class Command
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        if (!$this->path) {
+            $this->path = Command\Which::where($this->getName());
+        }
+
+        return $this->path;
+    }
+
 
     /**
      * @param $value
@@ -112,6 +126,13 @@ abstract class Command
         $this->outputToFile = $filename;
     }
 
+    /**
+     * @param string|Command $pipe
+     */
+    public function pipe($pipe)
+    {
+        $this->pipe = $pipe;
+    }
 
     /**
      * @param $name
@@ -165,12 +186,12 @@ abstract class Command
      */
     protected function getEnvironments()
     {
-        $ennvs = [];
+        $environments = [];
         foreach ($this->environments as $name => $value) {
-            $ennvs[] = $name . '=' . $this->escapeValue($value);
+            $environments[] = $name . '=' . $this->escapeValue($value);
         }
 
-        return $ennvs;
+        return $environments;
     }
 
     /**
@@ -208,6 +229,10 @@ abstract class Command
             $command .= ' < ' . $this->fromFile;
         }
 
+        if ($this->pipe) {
+            $command .= ' | ' . (string)$this->pipe;
+        }
+
         return $command;
     }
 
@@ -231,22 +256,26 @@ abstract class Command
 
     /**
      * @param string $cwd
+     * @param null|[] $env
      * @param null|int $timeout
      *
      * @return string
      */
-    public function run($cwd = null, $timeout = null)
+    public function run($cwd = null, $env = null, $timeout = null)
     {
-        $process = new Process($this, $cwd);
+        $env = array_merge($this->environments, (array)$env);
+        $this->environments = [];
+
+        $process = new Process($this->toString(), $cwd);
         $process->setTimeout($timeout);
 
-        if ($this->environments) {
-            $ennvs = [];
-            foreach ($this->environments as $name => $value) {
-                $ennvs[$name] = $this->escapeValue($value);
+        if ($env) {
+            $environments = [];
+            foreach ($env as $name => $value) {
+                $environments[$name] = $this->escapeValue($value);
             }
 
-            $process->setEnv($ennvs);
+            $process->setEnv($environments);
         }
 
         $process->mustRun();

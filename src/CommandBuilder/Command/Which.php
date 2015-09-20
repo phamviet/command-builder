@@ -19,4 +19,17 @@ class Which extends Command
 
         $this->arguments[0] = $command;
     }
+
+    /**
+     * @param string $command
+     * @param null|[] $env
+     *
+     * @return string
+     */
+    public static function where($command, $env = null)
+    {
+        $which = new self($command);
+
+        return $which->run(null, $env);
+    }
 }
